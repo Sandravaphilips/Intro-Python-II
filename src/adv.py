@@ -49,3 +49,45 @@ room['treasure'].s_to = room['narrow']
 # Print an error message if the movement isn't allowed.
 #
 # If the user enters "q", quit the game.
+
+import textwrap
+from player import Player
+
+player_name = input("Enter your name: ")
+players_room = room['outside']
+
+new_player = Player(player_name, room['outside'])
+
+wrapper = textwrap.TextWrapper(width=50) 
+
+while players_room:
+    print(new_player.current_room.name)
+    word_list = wrapper.wrap(text=new_player.current_room.description) 
+    for element in word_list: 
+        print(element) 
+
+    user_input = input("Enter a direction you want to go in or q to quit: ")
+    while user_input:
+        if user_input == 'n' or user_input == 's'or user_input == 'e' or user_input == 'w':
+            if user_input == 'n':
+                new_room = new_player.current_room.n_to
+            elif user_input == 's':
+                new_room = new_player.current_room.s_to
+            elif user_input == 'e':
+                new_room = new_player.current_room.e_to
+            else:
+                new_room = new_player.current_room.w_to
+            if not new_room:
+                print('Movement in that direction is not allowed!')
+            new_player.update_room(new_room)
+            players_room = new_room
+            break
+        elif user_input == 'q':
+            print('Thank you for playing our game. Hope to see you soon.') 
+            players_room = ''
+            break
+        else:
+            print('Wrong input!')
+            user_input = input("Enter a direction in n, s, e or w you want to go or q to quit: ")
+        
+    
