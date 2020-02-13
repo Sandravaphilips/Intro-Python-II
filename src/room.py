@@ -11,3 +11,9 @@ class Room:
         self.w_to = None
         self.list = []
 
+    def add_item(self, item):
+        self.list.append(item)
+
+    def remove_item(self, item):
+        del self.list[self.list.index(item)]
+
