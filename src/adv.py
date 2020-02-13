@@ -1,4 +1,5 @@
 from room import Room
+from item import Item
 
 # Declare all the rooms
 
@@ -21,6 +22,13 @@ chamber! Sadly, it has already been completely emptied by
 earlier adventurers. The only exit is to the south."""),
 }
 
+items = {
+    'first': Item('pen', 'used for writing'),
+    'second': Item('book', 'for readin purposes'),
+    'third': Item('laptop', 'Can perform a number of operations'),
+    'fourth': Item('phone', 'for making and receiving calls'),
+    'fifth': Item('bucket', 'for fetching water')
+}
 
 # Link rooms together
 
@@ -32,6 +40,10 @@ room['overlook'].s_to = room['foyer']
 room['narrow'].w_to = room['foyer']
 room['narrow'].n_to = room['treasure']
 room['treasure'].s_to = room['narrow']
+
+room['outside'].list = [items['first'], items['second']]
+room['foyer'].list = [items['third'], items['fourth']]
+room['overlook'].list = [items['fifth']]
 
 #
 # Main
@@ -65,9 +77,16 @@ while players_room:
     word_list = wrapper.wrap(text=new_player.current_room.description) 
     for element in word_list: 
         print(element) 
+    if len(new_player.current_room.list) == 0:
+        print("There are no items in this room")
+    else:
+        print('Items available in this room are: ')
+        for itm in new_player.current_room.list:
+            print(itm.name)
 
-    user_input = input("Enter a direction you want to go in or q to quit: ")
-    while user_input:
+    user_input = input("Enter an item you wat to take, a direction you want to go in or q to quit: ")
+    split_input = user_input.split()
+    while len(split_input) == 1:
         if user_input == 'n' or user_input == 's'or user_input == 'e' or user_input == 'w':
             if user_input == 'n':
                 new_room = new_player.current_room.n_to
@@ -86,8 +105,40 @@ while players_room:
             print('Thank you for playing our game. Hope to see you soon.') 
             players_room = ''
             break
+        elif user_input == 'i':
+            if len(new_player.list) == 0:
+                print('You have no items')
+            else:
+                print('Items you have currently are: ')
+                for itm in new_player.list:
+                    print(itm.name)
+            break
         else:
             print('Wrong input!')
-            user_input = input("Enter a direction in n, s, e or w you want to go or q to quit: ")
+            user_input = input("Enter an item you wat to take, a direction you want to go in or q to quit: ")
+
+    if len(split_input) == 2:
+        action = split_input[0]
+        action_item = split_input[1]
+        room_item = [i for i in new_player.current_room.list if i.name == action_item]
+        player_item = [i for i in new_player.list if i.name == action_item]
+
+        if action == 'get' or action == 'drop':
+            if len(room_item) > 0 or len(player_item) > 0:
+                if action == 'get':
+                    new_player.current_room.remove_item(room_item[0])
+                    new_player.add_item(room_item[0])
+                    print(room_item[0].on_take())
+                else:
+                    new_player.current_room.add_item(player_item[0])
+                    new_player.remove_item(player_item[0])
+                    print(player_item[0].on_drop())
+            else: 
+                print(f'There is no {action_item} in your room ')            
+        else:
+            print('Please enter a valid action')
+
+        
+    
         
     
